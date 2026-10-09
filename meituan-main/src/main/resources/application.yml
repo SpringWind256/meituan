@@ -1,0 +1,9 @@
+#端口号
+server:
+  port: 8080
+spring:
+  application:
+    #应用名称
+    name: meituan
+  profiles:
+    include: database,custom

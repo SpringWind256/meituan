@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chunfeng.mapper.UserMapper">
+    <sql id="selectUser">
+        select
+        u.`id`,
+        u.`username`,
+        u.`age`,
+        u.`role_id`,
+        r.`name` as role_name,
+        u.`sex`,
+        u.`sex` as `sex_name`,
+        u.`email`,
+        u.`qq`,
+        u.`wechat`,
+        u.`address`,
+        u.`avatar`,
+        u.`phone`,
+        u.`status`,
+        u.`create_time`,
+        u.`update_time`
+        from smart_villages_permission.user u
+        left join smart_villages_permission.role r on u.`role_id` = r.`id`
+        <where>
+            <if test="user.id!=null">
+                u.`id`=#{user.id}
+            </if>
+            <if test="user.username!='' and user.username!=null">
+                AND u.`username` LIKE concat('%',#{user.username},'%')
+            </if>
+            <if test="user.age!=null">
+                AND u.`age`=#{user.age}
+            </if>
+            <if test="user.roleId!=null">
+                AND u.`role_id`=#{user.roleId}
+            </if>
+            <if test="user.sex!=null">
+                AND u.`sex`=#{user.sex}
+            </if>
+            <if test="user.email!='' and user.email!=null">
+                AND u.`email`=#{user.email}
+            </if>
+            <if test="user.qq!='' and user.qq!=null">
+                AND u.`qq`=#{user.qq}
+            </if>
+            <if test="user.wechat!='' and user.wechat!=null">
+                AND u.`wechat`=#{user.wechat}
+            </if>
+            <if test="user.address!='' and user.address!=null">
+                AND u.`address` like concat('%',#{user.address},'%')
+            </if>
+            <if test="user.phone!='' and user.phone!=null">
+                AND u.`phone`=#{user.phone}
+            </if>
+            <if test="user.status!=null">
+                AND u.`status`=#{user.status}
+            </if>
+            and `u`.deleted=0
+            and `r`.deleted=0
+        </where>
+        order by `u`.create_time desc
+    </sql>
+    <!--条件查询用户表-->
+    <select id="selectUserPages" resultType="com.chunfeng.vo.UserVo">
+        <include refid="selectUser"/>
+    </select>
+    <!--按条件记录用户表的个数-->
+    <select id="countUserByCondition" resultType="java.lang.Integer">
+        select COUNT(id)
+        from smart_villages_permission.user
+        <where>
+            <if test="id!=null">
+                `id`=#{id}
+            </if>
+            <if test="username!='' and username!=null">
+                AND `username`=#{username}
+            </if>
+            <if test="password!='' and password!=null">
+                AND `password`=#{password}
+            </if>
+            <if test="age!='' and age!=null">
+                AND `age`=#{age}
+            </if>
+            <if test="roleId!='' and roleId!=null">
+                AND `role_id`=#{roleId}
+            </if>
+            <if test="sex!='' and sex!=null">
+                AND `sex`=#{sex}
+            </if>
+            <if test="email!='' and email!=null">
+                AND `email`=#{email}
+            </if>
+            <if test="qq!='' and qq!=null">
+                AND `qq`=#{qq}
+            </if>
+            <if test="wechat!='' and wechat!=null">
+                AND `wechat`=#{wechat}
+            </if>
+            <if test="address!='' and address!=null">
+                AND `address`=#{address}
+            </if>
+            <if test="avatar!='' and avatar!=null">
+                AND `avatar`=#{avatar}
+            </if>
+            <if test="phone!='' and phone!=null">
+                AND `phone`=#{phone}
+            </if>
+            <if test="status!='' and status!=null">
+                AND `status`=#{status}
+            </if>
+            <if test="deleted!=null">
+                AND `deleted`=#{deleted}
+            </if>
+            <if test="createTime!='' and createTime!=null">
+                AND `create_time`=#{createTime}
+            </if>
+            <if test="createUser!=null">
+                AND `create_user`=#{createUser}
+            </if>
+            <if test="updateTime!='' and updateTime!=null">
+                AND `update_time`=#{updateTime}
+            </if>
+            <if test="updateUser!=null">
+                AND `update_user`=#{updateUser}
+            </if>
+        </where>
+    </select>
+    <select id="selectUserVoById" resultType="com.chunfeng.vo.UserVo">
+        select u.id,
+        u.username,
+        u.password,
+        u.age,
+        u.role_id,
+        u.sex,
+        u.sex as `sex_name`,
+        u.email,
+        u.qq,
+        u.wechat,
+        u.address,
+        u.avatar,
+        u.phone,
+        r.name as `role_name`,
+        u.create_time,
+        u.update_time
+        from smart_villages_permission.user u
+        left join smart_villages_permission.role r on u.role_id = r.id
+        where u.id = #{id}
+        and u.deleted = 0
+        and r.deleted = 0
+        and u.status = 0
+    </select>
+    <!--条件查询用户表-->
+    <select id="selectUserList" resultType="com.chunfeng.vo.UserVo">
+        <include refid="selectUser"/>
+    </select>
+</mapper>

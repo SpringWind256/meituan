@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chunfeng.mapper.PermissionMapper">
+    <!--根据路由条件查询权限列表-->
+    <select id="selectPermissionByRouter" resultType="java.lang.Long">
+        select p.id
+        from permission p
+                 left join permission_router pr on p.id = pr.permission_id
+                 left join router r on pr.router_id = r.id
+        where r.id = #{routerId}
+          and p.deleted = 0
+          and r.deleted = 0
+          and pr.deleted = 0
+        order by p.`order`, p.create_time desc, p.update_time desc
+    </select>
+    <!--根据角色ID查询权限列表-->
+    <select id="selectPermissionByRole" resultType="java.lang.Long">
+        select p.id
+        from permission p
+                 left join permission_role r on p.id = r.permission_id
+                 left join role ro on r.role_id = ro.id
+        where ro.id = #{roleId}
+          and p.deleted = 0
+          and r.deleted = 0
+          and ro.deleted = 0
+        order by p.`order`, p.create_time desc, p.update_time desc
+    </select>
+    <!--根据用户查询权限列表-->
+    <select id="selectPermissionByUser" resultType="com.chunfeng.entity.Permission">
+        select p.id,
+               p.name,
+               p.path,
+               p.title,
+               p.note,
+               p.icon,
+               p.component,
+               p.redirect,
+               p.`order`,
+               p.affix,
+               p.hidden,
+               p.parent_id
+        from permission p
+                 left join permission_role pr on p.id = pr.permission_id
+                 left join role r on pr.role_id = r.id
+                 left join user u on r.id = u.role_id
+        where u.id = #{userId}
+          and p.deleted = 0
+          and pr.deleted = 0
+          and r.deleted = 0
+          and u.deleted = 0
+        order by p.`order`, p.create_time desc, p.update_time desc
+    </select>
+    <!--条件查询权限-->
+    <select id="selectPermissionPage" resultType="com.chunfeng.entity.Permission">
+        select id,
+        name,
+        path,
+        title,
+        note,
+        icon,
+        component,
+        redirect,
+        affix,
+        hidden,
+        parent_id,
+        `order`,
+        deleted,
+        create_time,
+        create_user,
+        update_time,
+        update_user
+        from permission
+        <where>
+            <if test="permission.name!=null and permission.name!=''">
+                name like concat('%',#{permission.name},'%')
+            </if>
+            <if test="permission.path!=null and permission.path!=''">
+                and path =#{permission.path}
+            </if>
+            <if test="permission.note!=null and permission.note!=''">
+                and entity =#{permission.note}
+            </if>
+            and deleted=0
+            order by `order`,create_time desc,update_time desc
+        </where>
+    </select>
+    <!--查询所有权限-->
+    <select id="selectAllPermission" resultType="com.chunfeng.entity.Permission">
+        select id,
+               name,
+               path,
+               title,
+               note,
+               icon,
+               component,
+               redirect,
+               affix,
+               hidden,
+               parent_id,
+               `order`,
+               deleted,
+               create_time,
+               create_user,
+               update_time,
+               update_user
+        from permission
+        where deleted = 0
+        order by `order`, create_time desc, update_time desc
+    </select>
+    <!--条件记录权限个数-->
+    <select id="countPermissionByCondition" resultType="java.lang.Integer">
+        select count(1)
+        from permission
+        <where>
+            <if test="per.path!=null and per.path!=''">
+                and path =#{per.path}
+            </if>
+            <if test="per.component!=null and per.component!=''">
+                and component =#{per.component}
+            </if>
+        </where>
+    </select>
+</mapper>

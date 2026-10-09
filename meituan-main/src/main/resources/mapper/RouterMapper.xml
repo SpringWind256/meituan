@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.chunfeng.mapper.RouterMapper">
+    <!--分页查询路由-->
+    <select id="selectRouterPage" resultType="com.chunfeng.entity.Router">
+        select id,
+        name,
+        uri,
+        method,
+        create_user,
+        create_time,
+        update_user,
+        update_time,
+        deleted
+        from router
+        <where>
+            <if test="router.name!=null and router.name!=''">
+                name like concat('%',#{router.name},'%')
+            </if>
+            <if test="router.uri!=null and router.uri!=''">
+                and uri=#{router.uri}
+            </if>
+            <if test="router.method!=null and router.method!=''">
+                and method=#{router.method}
+            </if>
+            and deleted=0
+        </where>
+        order by create_time desc,update_time desc
+    </select>
+    <!--根据权限ID查询路由-->
+    <select id="selectRouterByPermission" resultType="java.lang.Long">
+        select r.id
+        from router r
+        left join permission_router pr on r.id = pr.router_id
+        left join permission p on pr.permission_id = p.id
+        where p.id = #{perId}
+        and r.deleted = 0
+        and pr.deleted = 0
+        and p.deleted = 0
+    </select>
+    <!--根据角色查询路由信息-->
+    <select id="selectRouterByRole" resultType="java.lang.Long">
+        select r.id
+        from router r
+        left join permission_router pr on r.id = pr.router_id
+        left join permission p on pr.permission_id = p.id
+        left join permission_role pro on p.id = pro.permission_id
+        left join role ro on pro.role_id = ro.id
+        where ro.id = #{roleId}
+        and r.deleted = 0
+        and pr.deleted = 0
+        and pro.deleted = 0
+        and ro.deleted = 0
+        and p.deleted = 0
+    </select>
+    <!--根据用户查询路由-->
+    <select id="selectRouterByUser" resultType="com.chunfeng.entity.Router">
+        select r.uri,
+        r.method
+        from router r
+        left join permission_router pr on r.id = pr.router_id
+        left join permission p on pr.permission_id = p.id
+        left join permission_role pro on p.id = pro.permission_id
+        left join role ro on pro.role_id = ro.id
+        left join user u on ro.id = u.role_id
+        where u.id = #{userId}
+        and r.deleted = 0
+        and pr.deleted = 0
+        and pro.deleted = 0
+        and ro.deleted = 0
+        and u.deleted = 0
+    </select>
+    <!--按条件记录路由的个数-->
+    <select id="countRouterByCondition" resultType="java.lang.Integer">
+        select COUNT(id)
+        from router
+        <where>
+            <if test="router.uri!=null and router.uri!=''">
+                uri=#{router.uri}
+            </if>
+            <if test="router.method!=null and router.method!=''">
+                and method=#{router.method}
+            </if>
+            and deleted=0
+        </where>
+    </select>
+    <!--查询所有路由信息-->
+    <select id="selectAllRouter" resultType="com.chunfeng.entity.Router">
+        select id,
+        name,
+        uri,
+        method,
+        deleted,
+        create_time,
+        create_user,
+        update_time,
+        update_user
+        from router
+        where deleted = 0
+        order by create_time desc, update_time desc
+    </select>
+</mapper>
